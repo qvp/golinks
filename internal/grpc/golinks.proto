@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+//package grpc;
+option go_package = "internal/grpc";
+
+service Golinks {
+  rpc GetLinkImages (LinkImagesRequest) returns (LinkImagesReply);
+}
+
+message LinkImagesRequest {
+  string url = 1;
+}
+
+message LinkImagesReply {
+  repeated string message = 1;
+}

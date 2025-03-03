@@ -1,0 +1,109 @@
+basePath: /
+definitions:
+  db.LinkRow:
+    properties:
+      id:
+        type: integer
+      status:
+        type: string
+      url:
+        type: string
+    type: object
+  rest.ScmLink:
+    properties:
+      id:
+        type: integer
+      url:
+        type: string
+    type: object
+  rest.ScmLinkAdd:
+    properties:
+      url:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: fiber@swagger.io
+    name: API Support
+  description: This is a sample swagger for Fiber
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Fiber Example API
+  version: "1.0"
+paths:
+  /links:
+    get:
+      consumes:
+      - application/json
+      description: Long desc here
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.LinkRow'
+      summary: Get all links
+      tags:
+      - link
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Тело запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/rest.ScmLinkAdd'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.ScmLink'
+      summary: Add new link
+      tags:
+      - link
+  /links/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Link ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest.ScmLink'
+      summary: Get a link by its ID
+      tags:
+      - link
+  /test:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Тело запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/rest.ScmLinkAdd'
+      produces:
+      - application/json
+      responses: {}
+      summary: Get link images
+      tags:
+      - test
+swagger: "2.0"

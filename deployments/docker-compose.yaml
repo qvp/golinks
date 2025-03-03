@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+#  api:
+#    build: .
+#    ports:
+#      - "8080:8080"
+##    environment:
+##      ENC_KEY: ${ENC_KEY}
+##      ENC_IV: ${ENC_IV}
+##    restart: always
+#    command: ./golinks
+#    depends_on:
+#      - postgres
+#      - debezium
+#    links:
+#      - postgres
+
+  postgres:
+    image: postgres
+#    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    command: >
+      postgres -c wal_level=logical
+               -c max_replication_slots=10
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: golinks
+      POSTGRES_PASSWORD: golinks
+      POSTGRES_DATABASE: golinks
+    volumes:
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf:readonly
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+      - 5552:5552
+    environment:
+      RABBITMQ_DEFAULT_PASS: root
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_VHOST: vhost
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbitmq_management load_definitions '/etc/rabbitmq/definitions.json'"
+    volumes:
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:readonly
+
+  debezium:
+    image: quay.io/debezium/server:2.5
+    ports:
+      - 8080:8080
+    restart: always
+    volumes:
+      - ./debezium:/debezium/conf:readonly
+    depends_on:
+      - rabbitmq
+      - postgres
+    links:
+      - rabbitmq

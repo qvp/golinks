@@ -1,0 +1,1 @@
+delete from link where url in ('https://alex.md', 'https://vk.com');
