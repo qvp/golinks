@@ -19,7 +19,7 @@ var configDefault = ConsumerConfig{
 	PrefetchSize:  0,
 }
 
-func ConsumeQueue(config ConsumerConfig, handler func(d amqp.Delivery)) {
+func ConsumeQueue(config ConsumerConfig, handler func(d amqp.Delivery) error) {
 
 	//todo use configDefault
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"golinks/internal/db/sqlc"
-	"golinks/internal/link"
 
 	"golinks/internal/db"
 )
@@ -13,7 +12,6 @@ func RegisterLinksHandlers(app *fiber.App) {
 	app.Get("/links", getLinks)
 	app.Get("/links/:id", getLinkByID)
 	app.Put("/links", putLink)
-	app.Post("/test", getLinkImages)
 }
 
 // @Summary Get all links
@@ -32,10 +30,6 @@ func getLinks(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(500).SendString("Internal server error")
-	}
-
-	if links == nil {
-		links = []sqlc.Link{} // todo wtf?
 	}
 
 	return c.JSON(links)
@@ -85,23 +79,4 @@ func putLink(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(IDRs{ID: int(link_.ID)})
-}
-
-// @Summary Get link images
-// @Description
-// @Tags test
-// @Accept json
-// @Produce json
-// @Param request body ScmLinkAdd true "Тело запроса"
-// @Router /test [post]
-func getLinkImages(c *fiber.Ctx) error {
-	var newLink LinkAddRq
-	if err := c.BodyParser(&newLink); err != nil {
-		return c.Status(500).SendString("Internal server error")
-	}
-
-	page, _ := link.LoadHtml(newLink.Url)
-	images, _ := link.GetImagesFromHtml(page)
-
-	return c.JSON(images)
 }

@@ -22,7 +22,9 @@ import (
 func main() {
 	defer db.ClosePool()
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		JSONEncoder: rest.JSONEncoder,
+	})
 	app.Use(swagger.New(swagger.Config{FilePath: "./docs/swagger/swagger.json"}))
 
 	rest.RegisterLinksHandlers(app)

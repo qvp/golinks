@@ -1,4 +1,4 @@
-package link
+package parser
 
 import (
 	"io"
@@ -6,17 +6,18 @@ import (
 	"net/http"
 )
 
+// LoadHtml fetches the HTML content from the specified URL
 func LoadHtml(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Printf("Ошибка при выполнении запроса: %s\n", err)
+		log.Printf("LoadHtml request fail: %s\n", err)
 		return "", err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("Ошибка при чтении тела ответа: %s\n", err)
+		log.Printf("LoadHtml read body fail: %s\n", err)
 		return "", err
 	}
 

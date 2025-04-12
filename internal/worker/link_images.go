@@ -3,40 +3,42 @@ package worker
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"log"
 
 	"golinks/internal/db"
 	"golinks/internal/link"
 )
 
-func LinkImagesHandler(d amqp.Delivery) {
+func LinkImagesHandler(d amqp.Delivery) error {
 	var msg DebeziumMessage
 	err := json.Unmarshal(d.Body, &msg)
-	failOnError(err, "Message unmarshal fail")
+	if err != nil {
+		log.Printf("Message unmarshal fail %s", err)
+		return d.Nack(false, false)
+	}
 
-	linkIDFloat := msg.Payload.After["id"].(float64)
+	linkID := msg.Payload.After["id"].(int)
 	url := msg.Payload.After["url"].(string)
 	page, err := link.LoadHtml(url)
 	if err != nil {
-		fmt.Printf("%s: %s", "Unable to load url", err)
-		d.Nack(false, false)
-		return
+		log.Printf("unable to load url %s: %v", url, err)
+		return d.Nack(false, false)
 	}
 
 	images, err := link.GetImagesFromHtml(page)
 	if err != nil {
-		fmt.Printf("%s: %s", "Unable to parse page from url", err)
-		d.Nack(false, false)
-		return
-	}
-	// todo change status, dont save empty images list
-	err = db.Q.SaveLinkImagesTx(context.Background(), int(linkIDFloat), images)
-	if err != nil {
-		fmt.Printf("%s: %s", "Unable to save images", err)
-		d.Nack(false, false)
-		return
+		log.Printf("unable to parse page from url %s: %v", url, err)
+		return d.Nack(false, false)
 	}
 
-	d.Ack(false)
+	if len(images) > 0 {
+		err = db.Q.SaveLinkImagesTx(context.Background(), linkID, images)
+		if err != nil {
+			log.Printf("unable to save images for link %d: %v", linkID, err)
+			return d.Nack(false, false)
+		}
+	}
+
+	return d.Ack(false)
 }
