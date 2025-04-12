@@ -12,3 +12,6 @@ grpc:
 	go run ./cmd/grpc
 proto:
 	protoc --go_out=. --go-grpc_out=. ./internal/grpc/golinks.proto
+
+sqlc:
+	sqlc generate

@@ -3,6 +3,7 @@ package rest
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"golinks/internal/db/sqlc"
 	"golinks/internal/link"
 
 	"golinks/internal/db"
@@ -20,17 +21,21 @@ func RegisterLinksHandlers(app *fiber.App) {
 // @Tags link
 // @Accept json
 // @Produce json
-// @Success 200 {object} db.LinkRow
+// @Success 200 {object} sqlc.Link
 // @Router /links [get]
 func getLinks(c *fiber.Ctx) error {
-	links, err := db.Func.LinkList(c.Context())
+	params := sqlc.LinkGetListParams{
+		Limit:  10,
+		Offset: 0,
+	}
+	links, err := db.Q.LinkGetList(c.Context(), params)
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(500).SendString("Internal server error")
 	}
 
 	if links == nil {
-		links = []db.LinkRow{} // todo wtf?
+		links = []sqlc.Link{} // todo wtf?
 	}
 
 	return c.JSON(links)
@@ -50,13 +55,13 @@ func getLinkByID(c *fiber.Ctx) error {
 		return c.Status(400).SendString("Bad request")
 	}
 
-	link, err := db.Func.LinkGetByID(c.Context(), id)
+	link_, err := db.Q.LinkGetByID(c.Context(), int32(id))
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(404).SendString("Link not found") // another err
 	}
 
-	return c.JSON(link)
+	return c.JSON(link_)
 }
 
 // @Summary Add new link
@@ -68,18 +73,18 @@ func getLinkByID(c *fiber.Ctx) error {
 // @Success 200 {object} ScmLink
 // @Router /links [put]
 func putLink(c *fiber.Ctx) error {
-	var newLink ScmLinkAdd
+	var newLink LinkAddRq
 	if err := c.BodyParser(&newLink); err != nil {
 		return c.Status(500).SendString("Internal server error")
 	}
 
-	id, err := db.Func.LinkAdd(c.Context(), newLink.Url)
+	link_, err := db.Q.LinkAdd(c.Context(), newLink.Url)
 	if err != nil {
 		fmt.Println(err)
 		return c.Status(500).SendString("Internal server error")
 	}
 
-	return c.JSON(ScmIDResponse{ID: id})
+	return c.JSON(IDRs{ID: int(link_.ID)})
 }
 
 // @Summary Get link images
@@ -90,7 +95,7 @@ func putLink(c *fiber.Ctx) error {
 // @Param request body ScmLinkAdd true "Тело запроса"
 // @Router /test [post]
 func getLinkImages(c *fiber.Ctx) error {
-	var newLink ScmLinkAdd
+	var newLink LinkAddRq
 	if err := c.BodyParser(&newLink); err != nil {
 		return c.Status(500).SendString("Internal server error")
 	}

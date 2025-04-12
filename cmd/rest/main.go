@@ -3,10 +3,10 @@ package main
 import (
 	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
+	"log"
 
 	"golinks/internal/db"
 	"golinks/internal/rest"
-	"log"
 )
 
 // @title Fiber Example API
@@ -20,7 +20,7 @@ import (
 // @host localhost:8080
 // @BasePath /
 func main() {
-	defer db.Func.ClosePool()
+	defer db.ClosePool()
 
 	app := fiber.New()
 	app.Use(swagger.New(swagger.Config{FilePath: "./docs/swagger/swagger.json"}))

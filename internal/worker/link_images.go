@@ -31,7 +31,7 @@ func LinkImagesHandler(d amqp.Delivery) {
 		return
 	}
 	// todo change status, dont save empty images list
-	err = db.Func.LinkImageAddMultiple(context.Background(), int(linkIDFloat), images)
+	err = db.Q.SaveLinkImagesTx(context.Background(), int(linkIDFloat), images)
 	if err != nil {
 		fmt.Printf("%s: %s", "Unable to save images", err)
 		d.Nack(false, false)
