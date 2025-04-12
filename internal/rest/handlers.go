@@ -1,11 +1,9 @@
 package rest
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"golinks/internal/db/sqlc"
-
 	"golinks/internal/db"
+	"golinks/internal/db/sqlc"
 )
 
 func RegisterLinksHandlers(app *fiber.App) {
@@ -28,8 +26,7 @@ func getLinks(c *fiber.Ctx) error {
 	}
 	links, err := db.Q.LinkGetList(c.Context(), params)
 	if err != nil {
-		fmt.Println(err)
-		return c.Status(500).SendString("Internal server error")
+		return errorResponse(c, 500, err)
 	}
 
 	return c.JSON(links)
@@ -46,13 +43,12 @@ func getLinks(c *fiber.Ctx) error {
 func getLinkByID(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
-		return c.Status(400).SendString("Bad request")
+		return errorResponse(c, 400, err)
 	}
 
 	link_, err := db.Q.LinkGetByID(c.Context(), int32(id))
 	if err != nil {
-		fmt.Println(err)
-		return c.Status(404).SendString("Link not found") // another err
+		return errorResponse(c, 404, err)
 	}
 
 	return c.JSON(link_)
@@ -68,14 +64,15 @@ func getLinkByID(c *fiber.Ctx) error {
 // @Router /links [put]
 func putLink(c *fiber.Ctx) error {
 	var newLink LinkAddRq
-	if err := c.BodyParser(&newLink); err != nil {
-		return c.Status(500).SendString("Internal server error")
+
+	err := c.BodyParser(&newLink)
+	if err != nil {
+		return errorResponse(c, 500, err)
 	}
 
 	link_, err := db.Q.LinkAdd(c.Context(), newLink.Url)
 	if err != nil {
-		fmt.Println(err)
-		return c.Status(500).SendString("Internal server error")
+		return errorResponse(c, 500, err)
 	}
 
 	return c.JSON(IDRs{ID: int(link_.ID)})

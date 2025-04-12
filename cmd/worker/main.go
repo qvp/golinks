@@ -3,8 +3,10 @@ package main
 import "golinks/internal/worker"
 
 func main() {
-	conf := worker.ConsumerConfig{
-		QueueName: "link_images",
+	config := worker.ConsumerConfig{
+		ConsumerName: "link_images",
+		QueueName:    "link_images",
+		WorkersCount: 20, // todo env
 	}
-	worker.ConsumeQueue(conf, worker.LinkImagesHandler)
+	worker.ConsumeQueue(config, worker.LinkImagesHandler)
 }
