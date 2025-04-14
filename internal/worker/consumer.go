@@ -65,3 +65,8 @@ func failOnError(message string, err error) {
 		log.Panicf("%s: %s", message, err)
 	}
 }
+
+func nackOnError(d amqp.Delivery, message string, err error) error {
+	log.Printf("%s: %v", message, err)
+	return d.Nack(false, false)
+}
