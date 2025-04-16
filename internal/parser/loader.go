@@ -1,8 +1,8 @@
 package parser
 
 import (
+	"github.com/rs/zerolog/log"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -10,14 +10,14 @@ import (
 func LoadHtml(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Printf("LoadHtml request fail: %s\n", err)
+		log.Error().Msgf("LoadHtml request fail: %s\n", err)
 		return "", err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("LoadHtml read body fail: %s\n", err)
+		log.Error().Msgf("LoadHtml read body fail: %s\n", err)
 		return "", err
 	}
 

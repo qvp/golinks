@@ -1,8 +1,8 @@
 package parser
 
 import (
+	"github.com/rs/zerolog/log"
 	"golang.org/x/net/html"
-	"log"
 	"strings"
 
 	"github.com/gookit/goutil/arrutil"
@@ -13,7 +13,7 @@ func GetImagesFromHtml(page string) ([]string, error) {
 
 	doc, err := html.Parse(strings.NewReader(page))
 	if err != nil {
-		log.Printf("Ошибка при парсинге HTML: %v", err)
+		log.Error().Msgf("Ошибка при парсинге HTML: %v", err)
 		return res, err
 	}
 

@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
-	"log"
+	"github.com/rs/zerolog/log"
 
 	"golinks/internal/db"
 	"golinks/internal/rest"
@@ -29,5 +29,5 @@ func main() {
 
 	rest.RegisterLinksHandlers(app)
 
-	log.Fatalln(app.Listen("localhost:8080"))
+	log.Fatal().Err(app.Listen("localhost:8080"))
 }

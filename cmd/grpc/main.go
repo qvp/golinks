@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"log"
+	"github.com/rs/zerolog/log"
 	"net"
 
 	"google.golang.org/grpc"
 
 	pb "golinks/internal/grpc"
-	"golinks/internal/link"
+	"golinks/internal/parser"
 )
 
 type server struct {
@@ -16,12 +16,12 @@ type server struct {
 }
 
 func (s *server) GetLinkImages(ctx context.Context, in *pb.LinkImagesRequest) (*pb.LinkImagesReply, error) {
-	page, err := link.LoadHtml(in.GetUrl())
+	page, err := parser.LoadHtml(in.GetUrl())
 	if err != nil {
 		return nil, err
 	}
 
-	links, err := link.GetImagesFromHtml(page)
+	links, err := parser.GetImagesFromHtml(page)
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (s *server) GetLinkImages(ctx context.Context, in *pb.LinkImagesRequest) (*
 func main() {
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Fatal().Msgf("failed to listen: %v", err)
 	}
 
 	s := grpc.NewServer()
@@ -41,6 +41,6 @@ func main() {
 	log.Printf("server listening at %v", lis.Addr())
 
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		log.Fatal().Msgf("failed to serve: %v", err)
 	}
 }

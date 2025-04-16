@@ -3,7 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
-	"log"
+	"github.com/rs/zerolog/log"
 	"reflect"
 )
 
@@ -19,7 +19,7 @@ func JSONEncoder(v interface{}) ([]byte, error) {
 }
 
 func errorResponse(c *fiber.Ctx, code int, logMessage error) error {
-	log.Printf("handler error: %s", logMessage)
+	log.Error().Msgf("handler error: %s", logMessage)
 	// todo if debug .SendString(logMessage)
 	c.Status(code)
 
