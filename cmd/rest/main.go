@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/contrib/swagger"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
-
+	"golinks/internal/common"
 	"golinks/internal/db"
 	"golinks/internal/rest"
 )
@@ -20,7 +20,11 @@ import (
 // @host localhost:8080
 // @BasePath /
 func main() {
+	common.InitEnv()
+	db.InitDB()
 	defer db.ClosePool()
+
+	db.RunMigrations()
 
 	app := fiber.New(fiber.Config{
 		JSONEncoder: rest.JSONEncoder,
@@ -29,5 +33,5 @@ func main() {
 
 	rest.RegisterLinksHandlers(app)
 
-	log.Fatal().Err(app.Listen("localhost:8080"))
+	log.Fatal().Err(app.Listen(":8080"))
 }

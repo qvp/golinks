@@ -1,1 +1,1 @@
-delete from link where url in ('https://alex.md', 'https://vk.com');
+delete from link where url in ('https://picsum.photos', 'https://placehold.co');

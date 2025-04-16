@@ -13,8 +13,10 @@ RUN go mod download
 # Копируем исходный код в контейнер
 COPY . .
 
+RUN go mod tidy
+
 # Собираем приложение
-RUN CGO_ENABLED=0 GOOS=linux go build -o golinks .
+RUN CGO_ENABLED=0 GOOS=linux go build -o golinks ./cmd/rest
 
 # Используем минимальный образ alpine для финального контейнера
 FROM alpine:latest
@@ -24,6 +26,9 @@ WORKDIR /root/
 
 # Копируем собранный бинарный файл из builder stage
 COPY --from=builder /app/golinks .
+
+# Копируем все (todo убрать)
+COPY --from=builder /app ./
 
 # Открываем порт, на котором будет работать приложение
 #EXPOSE 8080

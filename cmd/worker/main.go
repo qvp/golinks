@@ -1,12 +1,17 @@
 package main
 
-import "golinks/internal/worker"
+import (
+	"golinks/internal/common"
+	"golinks/internal/worker"
+)
 
 func main() {
+	common.InitEnv()
+
 	config := worker.ConsumerConfig{
 		ConsumerName: "link_images",
 		QueueName:    "link_images",
-		WorkersCount: 20, // todo env
+		WorkersCount: common.GetEnvInt("WORKERS_COUNT", 1),
 	}
 	worker.ConsumeQueue(config, worker.LinkImagesHandler)
 }

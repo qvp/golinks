@@ -2,6 +2,7 @@ package worker
 
 import (
 	"github.com/rs/zerolog/log"
+	"os"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -14,13 +15,13 @@ type ConsumerConfig struct {
 
 func ConsumeQueue(config ConsumerConfig, handler func(d amqp.Delivery) error) {
 	if config.QueueName == "" {
-		log.Panicf("Empty queue name")
+		log.Panic().Msg("Empty queue name")
 	}
 	if config.WorkersCount == 0 {
 		config.WorkersCount = 10
 	}
 
-	conn, err := amqp.Dial("amqp://root:root@localhost:5672/vhost") // fixme
+	conn, err := amqp.Dial(os.Getenv("RABBITMQ_CONN"))
 	failOnError("Failed to connect to RabbitMQ", err)
 	defer conn.Close()
 
@@ -62,7 +63,7 @@ func ConsumeQueue(config ConsumerConfig, handler func(d amqp.Delivery) error) {
 
 func failOnError(message string, err error) {
 	if err != nil {
-		log.Panicf("%s: %s", message, err)
+		log.Panic().Msgf("%s: %s", message, err)
 	}
 }
 

@@ -1,24 +1,23 @@
 ## GoLinks
-Приложение получает от пользователя ссылку на веб страницу и скачивает все изображения с нее.
+Парсит веб страницу по переданной ссылке и возвращает url картинок из тегов img.  
+REST API: ссылка сохраняется в БД, откуда попадает в очередь и обрабатывается асинхронно.  
+gRPC: ссылка обрабатывается сразу и результат возвращается синхронно.  
 
-Небольшой микросервис, с которым можно общаться по REST API и gRPC.  
-Стэк Golang, fiber, pgx, Debezium, RabbitMQ.  
+Стек:
+* Golang
+* PostgreSQL
+* RabbitMQ
+* Debezium
+* Fiber
+* sqlc
+* migrate
+* pgx
+* zerolog
+* swagger
 
 ![](docs/architecture.png)
 
-## GUI
-[http://localhost:8080](http://localhost:8080) - Application swagger  
-[http://localhost:15672](http://localhost:15672) - RabbitMQ management (root / root)  
-
-## Migration
-Подготовить адрес соединения с бд:  
-`export POSTGRESQL_URL='postgres://golinks:golinks@localhost:5432/golinks?sslmode=disable'`
-
-Создать новую миграцию:  
-`migrate create -ext sql -dir internal/db/migrations -seq <name>`
-
-Запустить миграции:  
-`migrate -database ${POSTGRESQL_URL} -path internal/db/migrations up`
-
-Откатить последнюю миграцию:  
-`migrate -database ${POSTGRESQL_URL} -path internal/db/migrations down 1`
+## Run
+`make up` - запустить приложение в докер.  
+[http://localhost:8080/docs](http://localhost:8080/docs) - Application swagger  
+[http://localhost:15672](http://localhost:15672) - RabbitMQ management (root / root)
